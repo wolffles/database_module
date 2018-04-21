@@ -1,0 +1,64 @@
+1. What data types do each of these values represent?
+
+    "A Clockwork Orange" = string
+    42 = integer
+    09/02/1945 = date object
+    98.7 = float
+    $15.99 = price object
+
+2. Explain in your own words when a database might be used. Explain when a text file might be used.
+
+   I would use a database when I need to recall or create searches for a specific data. I would use a text file if it was a simple data, such as a list of dates or a list of names. Usually you wouldn't use a text file to store informations for entrees that have extra attributes.
+
+3. Describe one difference between SQL and other programming languages.
+
+   SQL is a declarative programming language; a declarative programming language is best described as a contrast to imperative/procedural languages. declarative languages do not imply how they want an operation performed, as long as it returns the desired result. where as imperative/procedural are operations to get to the desired results. A great example is if you were to order food to go vs cooking the food yourself. Declarative would be ordering food and other languages like javascript would be the ladder.
+
+4. In your own words, explain how the pieces of a database system fit together at a high level.
+
+   A database allows users to manipulate data using an interface or console. unlike a text file the database stores its information in binary format which is only readable by the application. These binary files have a special structure which allows the application to quickly read and write to them.
+
+5. Explain the meaning of table, row, column, and value.
+
+   table: A table is similar to a subject or genre, it represents the relation between the rows and columns.
+   row: a row is one entry, each row's different values pertain to that specific row.
+   column: a column is an attribute that all rows could have.
+   value: a value is the data that is stored in the cell and it has a specific meaning depending on where it is on the table ie: where rows and columns intersect.
+
+6. List 3 data types that can be used in a table.
+  1. string
+  2. integer
+  3. object
+
+7. running SQL:
+   SELECT date, amount
+   FROM payments;
+    2016-05-01	1500
+    2016-05-10	37
+    2016-05-15	124.93
+    2016-05-23	54.72
+  SELECT amount
+  FROM payments
+  WHERE amount > 500;
+   1500
+  SELECT *
+  FROM payments
+  WHERE payee = 'Mega Foods';
+   2016-05-15	 Mega Foods	 124.93	 Groceries
+
+8. writing SQL queries:
+   The email and sign-up date for the user named DeAndre Data.
+    SELECT email, signup
+    FROM users
+    WHERE name = 'DeAndre Data';
+    #=> datad@comcast.net	2008-01-20
+   The user ID for the user with email 'aleesia.algorithm@uw.edu'.
+    SELECT userid
+    FROM users
+    WHERE email = 'aleesia.algorithm@uw.edu';
+    #=> 1
+   All the columns for the user ID equal to 4.
+    SELECT *
+    FROM users
+    WHERE userid = 4;
+    #=> 4	Brandy Boolean	bboolean@nasa.gov	1999-10-15
