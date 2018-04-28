@@ -1,0 +1,118 @@
+1 & 2. List the commands for adding, updating, and deleting data & Explain the structure for each type of command.
+
+  * adding: INSERT INTO
+    INSERT INTO <table name> VALUES (in, order, of, columns, in, table);
+
+    or multiple inserts
+
+    INSERT INTO <table name> (arbitrary, order, of, columns)
+    VALUES
+    (values, in, same, order),
+    (values, separated, by, commas),
+    (end, insert, with, semi-colon);
+
+  * updating: UPDATE
+
+    #can also be a single line
+
+    UPDATE <table name>
+    SET <column>=<value>
+    WHERE <column>=<value>;
+
+  * deleting: DELETE FROM
+    DELETE FROM <table name> WHERE <column>=<value>
+
+3. What are some the data types that can be used in tables? Give a real world example of each.
+
+    numbers: floats, numeric, money, serial, bigint,
+    boolean: true/ false
+    text: char, character, text, varchar
+    date & time: date, interval, time
+
+4. #create a table to track the wedding.
+  $ createdb wedding
+  $ psql wedding
+  wedding=# CREATE TABLE invited(
+    id integer,
+    first text,
+    last text,
+    rsvp boolean,
+    extra_guests integer,
+    number_of_meals float
+  );
+  wedding=# ALTER TABLE invited ADD COLUMN replied boolean;
+  wedding=# ALTER TABLE invited DROP COLUMN number_of_meals;
+  wedding=# ALTER TABLE invited ADD COLUMN table_number integer;
+  wedding=# DROP table invited;
+  wedding=# \q
+  $ dropdb wedding
+
+5. create a table to hold books in a library.
+  $ createdb library
+  $ psql library
+  library=# CREATE TABLE books(
+    ISBN serial,
+    title text,
+    author text,
+    genre text,
+    publishing_date date,
+    copies integer,
+    available_copies integer
+  );
+  library=# INSERT INTO books (title, author, genre, publishing_date, copies, available_copies)
+  VALUES
+  ('book 1', 'Wolfgang Truong', 'mystery', '1993-10-18', 3, 0),
+  ('book 2', 'allen hunt', 'horror', '1893-11-05', 1, 1),
+  ('book 3', 'lone survivor', 'romance', '2077-10-31', 5, 1);
+
+  library=# UPDATE books
+  SET available_copies=available_copies-1
+  WHERE ISBN=2;
+
+  library=# DELETE FROM books WHERE ISBN=2
+  library=# \q
+  $ dropdb library
+
+6. Create a table to hold spacecrafts.
+  # using database from last checkpoint
+  $ psql inventory
+  inventory=# CREATE TABLE spacecrafts(
+    id serial,
+    name text,
+    launched interval year,
+    origin text,
+    description text,
+    currently_operating boolean,
+    distance_from_earth bigint
+  );
+
+  inventory=# INSERT INTO spacecrafts (name, launched, origin, description, currently_operating, distance_from_earth)
+  VALUES
+  ('Imagination', '2010', 'Wakanda', 'Wakandians search for possible origin of Vibranium meteor', true, 31313136453),
+  ('Hulk''s Quinjet', '1995', 'Sokovia', 'hulk had to go to sakaar for Thor 3', false, 123437456947463),
+  ('Opportunity', '2003', 'NASA', 'automated motor vehicle for exploring surface of mars', true, 33900000);
+
+  inventory=# DELETE FROM spacecrafts WHERE id = 2;
+  inventory=# UPDATE spacecrafts SET currently_operating=false WHERE name='Imagination';
+
+  7. Create a table to hold emails in your inbox.
+    # using same database
+    inventory=# CREATE TABLE emails(
+    id serial,
+    subject text,
+    sender text,
+    cc text[],
+    body text,
+    time timestamp,
+    read boolean,
+    parent_id integer
+    );
+    inventory=# INSERT INTO emails (subject, sender, cc, body, time, read, parent_id)
+    VALUES
+    ('email 1 sub', 'foo@gmail.com', '{{other@mail.com}, {space@mail.com}}', 'the body of the email', '2004-10-19 10:23:54', false, null),
+    ('spam mail sub', 'foo@gmail.com', '{{other@mail.com}, {space@mail.com}}', 'the body of the spam', '2014-10-19 10:23:54', true, null),
+    ('resend email', 'foo@gmail.com', '{{other@mail.com}, {space@mail.com}}', 'the body of the resend', '2077-10-19 10:23:54', false, null);
+    inventory=# DELETE FROM emails Where id = 1;
+    inventory=# UPDATE emails SET read=false WHERE id=2
+    \q
+    dropdb inventory
