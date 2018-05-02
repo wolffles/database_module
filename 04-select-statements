@@ -1,0 +1,146 @@
+1. Write out a generic SELECT statement.
+  SELECT <column1, column2>
+  FROM <table>
+  (optional): WHERE <conditional statement>
+  AND <conditional statement>
+  OR <conditional statement>
+  ORDER by <column> <DESC ASC> (default is ASC);
+
+2. Create a fun way to remember the order of operation in a select statement.
+  Scarlett Johanson went to
+  SELECT snacks FROM the_snack_table WHERE chocolates AND fruits OR drinks ORDERED BY smallest to largest SEMICOLIN the end
+
+3. CREATE TABLE dogs (
+  "id"          INTEGER,
+  "name"        VARCHAR(25),
+  "gender"      VARCHAR(1),
+  "age"         INTEGER,
+  "weight"      INTEGER,
+  "breed"       TEXT,
+  "intake_date" DATE,
+  "in_foster"   DATE
+  );
+*Display the name, gender, and age of all dogs that are part Labrador.
+  SELECT name, gender, age
+  FROM dogs
+  WHERE breed LIKE '%labrador%';
+#=>
+  name	gender	age
+  Boujee	F	   3
+  Marley	M	   0
+*Display the ids of all dogs that are under 1 year old.
+  SELECT id
+  FROM dogs
+  WHERE age < 1;
+#=>
+  id
+  10002
+  10004
+*Display the name and age of all dogs that are female and over 35lbs.
+  SELECT *
+  FROM dogs
+  WHERE gender = 'f'
+  AND weight > 35;
+#=>
+  id	name	gender	age	weight	breed	intake_date	in_foster
+  10001	Boujee	F	3	36	labrador poodle	2017-06-22	(null)
+*Display all of the information about all dogs that are not Shepherd mixes.
+  SELECT *
+  FROM dogs
+  WHERE breed NOT LIKE '%shepard%';
+#=>
+  id	name	gender	age	weight	breed	intake_date	in_foster
+  10001	Boujee	F	3	36	labrador poodle	2017-06-22	(null)
+  10002	Munchkin	F	0	8	dachsund chihuahua	2017-01-13	2017-01-31
+  10004	Marley	M	0	10	labrador	2017-05-04	2016-06-20
+  10003	Lassie	F	7	17	collie shepherd	2016-07-05	2017-07-22
+  10006	Marmaduke	M	7	150	great dane	2016-03-22	2016-05-15
+  10007	Rosco	M	5	180	rottweiler	2017-04-01	(null)
+*Display the id, age, weight, and breed of all dogs that are either over 60lbs or Great Danes.
+  SELECT id,age,weight,breed
+  FROM dogs
+  WHERE weight > 60
+  OR breed = 'great dane';
+#=>
+  id	age	weight	breed
+  10006	7	150	great dane
+  10007	5	180	rottweiler
+
+4. Given this cats table, what records are returned from these queries?
+* SELECT name, adoption_date FROM cats;
+#=>
+  name	adoption_date
+  Mushi	2016-03-22
+  Seashell	(null)
+  Azul	2016-04-17
+  Victoire	2016-09-01
+  Nala	(null)
+* SELECT name, age FROM cats;
+#=>
+  name	age
+  Mushi	1
+  Seashell	7
+  Azul	3
+  Victoire	7
+  Nala	1
+
+5. From the cats table, write queries to select the following pieces of data.
+* Display all the information about all of the available cats.
+  SELECT *
+  FROM cats
+#=>
+  id	name	gender	age	intake_date	adoption_date
+  1	Mushi	M	1	2016-01-09	2016-03-22
+  2	Seashell	F	7	2016-01-09	(null)
+  3	Azul	M	3	2016-01-11	2016-04-17
+  4	Victoire	M	7	2016-01-11	2016-09-01
+  5	Nala	F	1	2016-01-12	(null)
+* Display the name and sex of all cats who are 7 years old.
+  SELECT name, gender
+  FROM cats
+  WHERE age = 7;
+#=>
+  name	gender
+  Seashell	F
+  Victoire	M
+*Find all of the names of the cats, so you don’t choose duplicate names for new cats.
+  SELECT name
+  FROM cats;
+#=>
+  name
+  Mushi
+  Seashell
+  Azul
+  Victoire
+  Nala
+6. list each comparison operator and explain, in your own words, when you would use it. Include a real world example for each.
+
+  > greater than
+  < less than
+  = is equal to
+  <= less or equal to
+  >= greater or equal to
+  != || <> not equal to
+  LIKE match a pattern to
+  IS DISTINCT FROM not equal to, null counts as value
+  expression IS TRUE || IS FALSE check to see if expression is true.
+  a BETWEEN x AND y checks a value is between two related values
+  IS NULL similar to IS TRUE or IS FALSE
+  AND to join conditional statements
+  OR if one condition is satisfied
+  NOT is a negative boolean
+7. From the cats table, what data is returned from these queries?
+  * SELECT name FROM cats WHERE gender = 'F';
+    #=> name
+    Seashell
+    Nala
+  * SELECT name FROM cats WHERE age <> 3;
+    #=> name
+    Mushi
+    Seashell
+    Victoire
+    Nala
+  * SELECT ID FROM cats WHERE name != ‘Mushi’ AND gender = ‘M’;
+  #=> id
+  3
+  4
