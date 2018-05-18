@@ -1,0 +1,28 @@
+Design a data model for students and the classes they have taken. The model should include the students' grades for a given class.
+
+    students
+    -------------
+    * student_id
+    * first_name
+    * last_name
+    * enrolled?
+
+    enrollment
+    -------------
+    * student_id
+    * class_id
+    * semester
+    * grade
+
+    classes
+    -----------
+    * class_id
+    * class_name
+    * department_id
+    * semester
+
+    department
+    -----------
+    * department_id
+    * department_name
+    
