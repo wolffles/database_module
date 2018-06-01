@@ -1,0 +1,51 @@
+1.In your own words, explain the benefits of normalization. Include a real-world scenario where normalization is necessary.
+
+  normalization is a style of creating database schemas, focusing on avoiding data redundancy and improving the consistency in relationship between columns. normalization is usually used with transaction processes where inserts into and updates are going to be the main use of the database. applications that require lots of searches would not scale well with normalized data.
+
+2. List and explain the different normal forms and how they relate to one another, with regard to your real-world scenario in the first question.
+
+  there are 4 normal forms 1NF, 2NF 3NF or BCNF aka 3.5NF
+
+  * 1NF: (first normal form) rows cannot contain multiple values.
+  * 2NF: (second normal form) includes 1NF and non-key columns/ attributes cannot be dependent on subsets
+  * 3NF: (third normal form) includes 2NF and every non-prime attribute must have a non-transitive functional dependency on every candidate key.
+  * BCNF/3.5NF (Boyce Codd normal form) is 3NF but stricter. every dependency (other than trivial dependencies) must be a super key of the table.
+
+3.
+
+Students
+-------------------------------
+student_id student_email student_name
+1	john.b20@hogwarts.edu	John B
+2	sarah.s20@hogwarts.edu	Sarah S
+3	martha.l20@hogwarts.edu	Martha L
+4	james.g20@hogwarts.edu	James G
+5	stanley.p20@hogwarts.edu	Stanley P
+
+Professors
+------------------------------------
+professor_id professor_name subject
+1	Natalie M	Economics
+2	William C	Philosophy
+3	Mark W	Mathematics
+
+student_records
+--------------------------------------
+student_id professor_id grade
+1 2 A
+2 2 C
+3 1 A
+4 3 B
+3 1 B
+
+4. In your own words, explain the potential disadvantages of normalizing the data above. What are its trade-offs? Submit your findings in the submission table and discuss them with your mentor in your next session.
+
+  Normalization falls short when many of read operations take place, because the data is split up tables will need to be joined in order to get specific data. Table joins are costly.
+
+5. Looking at the tables you have normalized. If you need to denormalize to improve query performance or speed up reporting, how would you carry out denormalization for this database design? Submit potential strategies in the submission tab and discuss them with your mentor in your next session.
+
+  Regarding the Student_records table, to denormalize the database one would first want to think about the uses for the database. If the database is purely going to be used to keep track and look up grades of a student in a professor's class then all you would need is to use the original table.
+
+6. Explore the trade-offs between data normalization and denormalization in this scenario, submit your findings in the submission tab, and discuss them with your mentor in your next session.
+
+ Like stated earlier a normalized database is good for update, inserts, and general storage because it avoids redundancies, and usually have smaller tables. Where as denormalized DBs will be good for analytics, reading, and queries. these two styles show its performance difference as the data scales larger.
