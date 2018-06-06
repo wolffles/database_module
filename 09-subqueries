@@ -1,0 +1,223 @@
+1. Explain a subquery in your own words.
+  a subquery is a standard query within another query.
+2. Where can you use a subquery within a SELECT statement.
+  It usually is in a WHERE clause, but can also be in the FROM clause as well.
+3. When would you employ a subquery?
+  Subqueries can be used to return either a single value or a rowset; whereas, joins are used to return rows.
+4. explain a row constructor in your own words.
+  A ROW constructor is an expression that creates a rowset. a rowset is a parenthesized ordered set of values that don't take up a whole row but a column in a row. a rowset must have the same amount of items in its set as the subquery.
+5. what happens if a row in the subquery result provides a NULL value to the comparison
+  if one right-side row yields null for the operator's result, the result of the comparison will be null or not true.
+6. What are the ways to use a subquery within a where clause?
+  EXISTS: If the subquery returns at least one row, the exists returns true; otherwise, it returns false.
+  NOT EXISTS: If the subquery does not return at least one row, the exists returns true; otherwise, it returns false.
+  IN: the result of IN is true if any matching subquery row is found; otherwise, the result is false if no matching row is found. if the subquery returns no rows, the result is also false; however, if the left-hand side evaluates to null, the result will be NULL.
+  NOT IN: When using NOT IN, the subquery must return exactly 0 matching rows.
+
+  ANY & SOME: ANY and SOME are equivalent. each is a boolean operator returning true or false depending on whether or not one or more subquery rows is found to match the given expression. both return true provided that at least one matching row is found.
+  ALL: For All to return true either every result returned by the subquery must match the given condition or the subquery must return no rows.
+7. write queries for an adoption schema.
+  * All volunteers. if the volunteer is fostering a dog, include each dog as well.
+  SELECT concat_ws(' ', first_name, last_name) volunteer,
+  foster_dog_id IS NOT NULL fostering,
+  (SELECT name
+   FROM dogs
+   WHERE foster_dog_id = id)
+  FROM volunteers
+#=>
+  concat_ws	fostering	name
+  ----------------------------------
+  Albus Dumbledore	false	(null)
+  Rubeus Hagrid	true	Munchkin
+  Remus Lupin	false	(null)
+  Sirius Black	false	(null)
+  Marjorie Dursley	true	Marmaduke
+
+  * The cat's name, adopter's name, and adopted date for each cat adopted within the past month to be displayed as part of the "Happy Tail" social media promotion which posts recent successful adoptions.
+  SELECT (SELECT name FROM cats where cat_id = id) cat_name,
+    (SELECT concat_ws(' ',first_name, last_name) adopter FROM adopters WHERE adopter_id = id),
+    date
+  FROM cat_adoptions
+  WHERE date > CURRENT_DATE - Interval '31 DAYS'
+#=>
+  cat_name	adopter	date
+  ---------------------------------------
+  Mushi	Arabella Figg	2018-05-05
+  Victoire	Argus Filch	2018-05-10
+
+  * Adopters who have not yet chosen a dog to adopt and generate all possible combinations of adopters and available dogs.
+  SELECT concat_ws(' ', a.first_name, a.last_name) as adopter, d.name
+  FROM adopters a CROSS JOIN
+       dogs d
+  WHERE NOT EXISTS (SELECT 1 FROM dog_adoptions da where da.adopter_id = a.id) AND
+        NOT EXISTS (SELECT 1 FROM dog_adoptions da WHERE da.dog_id = d.id)
+#=>
+  adopter	name
+  ----------------------
+  Hermione Granger	Boujee
+  Arabella Figg	Boujee
+  Hermione Granger	Munchkin
+  Arabella Figg	Munchkin
+  Hermione Granger	Marley
+  Arabella Figg	Marley
+  Hermione Granger	Lassie
+  Arabella Figg	Lassie
+  Hermione Granger	Marmaduke
+  Arabella Figg	Marmaduke
+
+  * Lists of all cats and all dogs who have not been adopted.
+  SELECT name
+  FROM cats c
+  WHERE NOT EXISTS ( SELECT 1 FROM cat_adoptions ca WHERE ca.cat_id = c.id)
+  Union
+  SELECT name
+  From dogs d
+  WHERE NOT EXISTS ( SELECT 1 From dog_adoptions da WHERE da.dog_id = d.id)
+#=>
+  name
+  -------------
+  Boujee
+  Lassie
+  Marley
+  Marmaduke
+  Munchkin
+  Nala
+  Seashell
+
+  * The name of the person who adopted Rosco.
+  SELECT concat_ws(' ', a.first_name, a.last_name) adopter
+    FROM adopters a
+    JOIN dog_adoptions da
+    ON da.adopter_id = a.id
+    WHERE da.dog_id = (
+      SELECT id
+      FROM dogs
+      WHERE name = 'Rosco'
+    );
+#=>
+  adopter
+  ---------------
+  Argus Filch
+
+8. Write queries applying the following scenarios, and include the results:
+  * To determine if the library should buy more copies of a given book, please provide the names and positions, in order, of all the patrons with a hold(request for a book with all copies checked out) on "Advanced Potion-Making".
+  SELECT p.name, h.rank
+  FROM patrons p
+  join holds h
+  ON p.id = h.patron_id
+  WHERE h.isbn = (SELECT isbn
+                  FROM books
+                  WHERE title = 'Advanced Potion-Making')
+#=>
+  name	rank
+  ------------------------
+  Terry Boot	1
+  Cedric Diggory	2
+
+  * Make a list of all book titles and denote whether or not a copy of that book is checked out.
+  SELECT b.title,
+  (SELECT checked_in_date IS NULL AS checked_out FROM Transactions WHERE b.isbn = isbn AND checked_in_date IS NULL),
+  (SELECT checked_out_date AS checked_out_date FROM transactions WHERE  b.isbn = isbn AND checked_in_date IS NULL)
+   FROM books b
+#=>
+  title	checked_out	checked_out_date
+  ---------------------------------------------------------
+  Hogwarts: A History	(null)	(null)
+  Fantastic Beasts and Where to Find Them	true	2018-05-23
+  Advanced Potion-Making	true	2018-05-21
+
+  * In an effort to learn which books take longer to read, the librarians would like you to create a list of average checked out time by book name in the past month.
+  SELECT isbn, title,
+  (SELECT AVG(checked_in_date - checked_out_date) average
+     FROM transactions t
+     WHERE b.isbn = t.isbn
+     AND
+     t.checked_out_date > CURRENT_DATE - INTERVAL '31 DAYS'
+  )
+  FROM books b
+#=>
+  isbn	title	average
+  ---------------------------------------------------------
+  1840918626	Hogwarts: A History	(null)
+  3458400871	Fantastic Beasts and Where to Find Them	2.5
+  9136884926	Advanced Potion-Making	(null)
+
+  * In order to learn which items should be retired, make a list of all books that have not been checked out in the past 5 years.
+  SELECT isbn,
+    (SELECT title
+     FROM books b
+     WHERE t.isbn = b.isbn),
+     MAX(checked_out_date) last_checked
+  FROM transactions t
+  GROUP BY isbn
+  HAVING CURRENT_DATE - INTERVAL '5 YEARS' > MAX(t.checked_out_date)
+#=>
+  isbn	title	last_checked
+  -------------------------------------------
+  1840918626	Hogwarts: A History	2012-05-23
+
+  * List all of the library patrons. If they have one or more books checked out, correspond the books to the patrons.
+  SELECT p.name,
+    (SELECT checked_in_date IS NULL AS active
+     FROM transactions t
+     WHERE p.id = t.patron_id AND b.isbn = t.isbn AND checked_in_date IS NULL),
+      b.title
+  FROM patrons p
+  LEFT OUTER JOIN transactions t
+  ON p.id = t.patron_id  AND checked_in_date IS NULL
+  LEFT OUTER JOIN books b
+  ON b.isbn = t.isbn
+#=>
+  name	active	title
+  ---------------------------------------------
+  Hermione Granger	(null)	(null)
+  Terry Boot	true	Advanced Potion-Making
+  Padma Patil	(null)	(null)
+  Cho Chang	(null)	(null)
+  Cedric Diggory	true	Fantastic Beasts and Where to Find Them
+
+9. using the flight schema and data. write queries for these situations.
+  * To determine the most profitable airplanes, find all airplane models where each flight has had over 250 paying customers in the past month.
+
+    SELECT airplanes.airplane_model
+    FROM (SELECT airplane_model
+      FROM transactions t
+      JOIN flights f
+      ON f.flight_number = t.flight_number
+      WHERE t.date > CURRENT_DATE - INTERVAL '1 month'
+      GROUP BY f.airplane_model
+      HAVING SUM(seats_sold) > 250) AS airplanes;
+  #=>
+    airplane_model
+    Boeing 777
+    Airbus A330
+    Airbus A380
+    Boeing 787
+
+  * To determine the most profitable flights, find all destination-origin pairs where 90% or more of the seats have been sold in the past month.
+    SELECT concat_ws('-', origin, destination) trip,  round((seats_sold::decimal/seat_capacity), 2) percent_sold
+    FROM (SELECT f.origin, f.destination, t.seats_sold, a.seat_capacity
+        FROM flights f
+        JOIN transactions t ON t.flight_number = f.flight_number
+        JOIN airplanes a ON f.airplane_model = a.model
+        WHERE (seats_sold::DECIMAL / seat_capacity) >= .9
+       ) AS trips;
+  #=>
+  trip	percent_sold
+  LHR-JFK	1
+  SFO-HKG	0.95
+  LHR-JNB	0.9
+
+  * The airline is looking to expand its presence in Asia and globally. Find the total revenue of any flight (not time restricted) arriving at or departing from Singapore (SIN).
+    SELECT  concat_WS(' - ', origin, destination) trip, total_revenue
+    FROM (SELECT f.origin, f.destination, total_revenue
+          FROM flights f
+          JOIN transactions t ON t.flight_number = f.flight_number
+         ) AS trips
+    WHERE concat_WS(' - ', origin, destination) LIKE '%SIN%'
+  #=>
+    trip	total_revenue
+    SIN - MAN	250394.7
+    MEL - SIN	131992.12
+
+10. when pulling data from more than 1 table joins ended up being much easier, but subqueries worked just as well when only dealing with an extra table.
